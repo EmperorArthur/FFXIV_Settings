@@ -12,12 +12,13 @@ in_file_name = "MACRO.DAT"
 
 #After a 0x11 byte header, the macro entries begin. All macro entries are XOR encoded with 0x73.
 
-#Function to xor a binary string with 0x73
-def xor73(in_str):
+#Exclusive or each byte of a string wtih a number
+#Returns the modified string
+def xor(in_str,num):
     output = []
     for i in in_str:
         #This doesn't work in python3 :(
-        output.append(chr(ord(i) ^ 0x73))
+        output.append(chr(ord(i) ^ num))
     #convert output to a string
     output = ''.join(output)
     return output
@@ -29,11 +30,11 @@ class macro_section:
         self.size = 0
         self.data= ''
         if(inFile):
-            header = xor73(in_file.read(3))
+            header = xor(in_file.read(3),0x73)
             self.type = header[0]
             self.size = unpack('H',header[1:3])[0]
             #Going to go ahead and lop off the null terminating byte now
-            self.data= xor73(in_file.read(self.size))[0:-1]
+            self.data= xor(in_file.read(self.size),0x73)[0:-1]
 
 class macro:
     def __init__(self, inFile = None):
