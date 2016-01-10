@@ -25,34 +25,40 @@ def xor(in_str,num):
 
 #Read and unpack a macro section
 class macro_section:
-    def __init__(self, inFile = None):
+    def __init__(self, in_file = None):
         self.type = ''
         self.size = 0
         self.data= ''
         if(inFile):
-            header = xor(in_file.read(3),0x73)
-            self.type = header[0]
-            self.size = unpack('H',header[1:3])[0]
-            #Going to go ahead and lop off the null terminating byte now
-            self.data= xor(in_file.read(self.size),0x73)[0:-1]
+            self.read(in_file)
+
+    def read(self,in_file):
+        header = xor(in_file.read(3),0x73)
+        self.type = header[0]
+        self.size = unpack('H',header[1:3])[0]
+        #Going to go ahead and lop off the null terminating byte now
+        self.data= xor(in_file.read(self.size),0x73)[0:-1]
 
 class macro:
-    def __init__(self, inFile = None):
+    def __init__(self, in_file = None):
         self.name = ''
         self.icon = 0
         self.key = 0
         self.lines = []
-        if(inFile):
-            macro_sections=[]
-            #There are exactly 18 sections per macro
-            for i in range(0,18):
-                macro_sections.append(macro_section(in_file))
-            self.name = macro_sections[0].data
-            self.icon = macro_sections[1].data
-            self.key = macro_sections[2].data
-            #Every macro has 15 lines
-            for i in range(3,18):
-                self.lines.append(macro_sections[i].data)
+        if(in_file):
+            self.read(in_file)
+
+    def read(self,in_file):
+        macro_sections=[]
+        #There are exactly 18 sections per macro
+        for i in range(0,18):
+            macro_sections.append(macro_section(in_file))
+        self.name = macro_sections[0].data
+        self.icon = macro_sections[1].data
+        self.key = macro_sections[2].data
+        #Every macro has 15 lines
+        for i in range(3,18):
+            self.lines.append(macro_sections[i].data)
 
 
 
