@@ -6,6 +6,8 @@ Used this research as a jumping off point:
 Currently Completed:
 * FFXIV Macro Extractor:
     * A python script to decompress the FFXIV macro file, and display the results
+* FFXIV Keybind Extractor:
+    * A python script to decompress the FFXIV keybind file, and display the results
 
 Research Notes:
 * All files seem to be using a similar header structure, with the data itself xored.
