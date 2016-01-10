@@ -38,6 +38,15 @@ class macro_section:
         #Going to go ahead and lop off the null terminating byte now
         self.data= xor(in_file.read(size),0x73)[0:-1]
 
+    def write(self,out_file):
+        if(len(self.type) != 1):
+            raise Exception('Invalid macro section type!')
+        header= self.type + pack('H',len(self.data))
+        out_file.write(header)
+        out_file.write(xor(self.data,0x73))
+        #Add back the null byte when writing
+        out_file.write(0x00)
+
 class macro:
     def __init__(self, in_file = None):
         self.name = ''
@@ -59,7 +68,22 @@ class macro:
         for i in range(3,18):
             self.lines.append(macro_sections[i].data)
 
-
+    def write(self,out_file):
+        macro_sections=[]
+        for i in range(0,18):
+            macro_sections.append(macro_section())
+        macro_sections[0].type = 'T'
+        macro_sections[0].data = self.name
+        macro_sections[1].type = 'I'
+        macro_sections[1].data = self.icon
+        macro_sections[2].type = 'K'
+        macro_sections[2].data = self.key
+        #Every macro has 15 lines
+        for i in range(3,18):
+            macro_sections[i].type = 'L'
+            macro_sections[i].data = self.lines[i]
+        for i in range(0,18):
+            macro_sections[i].write(out_file)
 
 def print_macro(in_macro):
     print("Name: ",in_macro.name)
@@ -67,7 +91,7 @@ def print_macro(in_macro):
     print("Key:  ",in_macro.key)
     print("Data (15 lines):")
     for i in in_macro.lines:
-        #Sanitize the line to ascii only characters to prevent print from choking (For python2)
+        #Sanitize the line to ascii only characters to prevent print from choking (For python3)
         #sanitized_line = i.encode('ascii','ignore').decode('ascii')
         sanitized_line = i
         print("    ",sanitized_line)
