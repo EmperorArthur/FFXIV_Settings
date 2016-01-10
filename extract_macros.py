@@ -27,7 +27,6 @@ def xor(in_str,num):
 class macro_section:
     def __init__(self, in_file = None):
         self.type = ''
-        self.size = 0
         self.data= ''
         if(inFile):
             self.read(in_file)
@@ -35,9 +34,9 @@ class macro_section:
     def read(self,in_file):
         header = xor(in_file.read(3),0x73)
         self.type = header[0]
-        self.size = unpack('H',header[1:3])[0]
+        size = unpack('H',header[1:3])[0]
         #Going to go ahead and lop off the null terminating byte now
-        self.data= xor(in_file.read(self.size),0x73)[0:-1]
+        self.data= xor(in_file.read(size),0x73)[0:-1]
 
 class macro:
     def __init__(self, in_file = None):
