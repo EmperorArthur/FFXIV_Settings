@@ -22,7 +22,7 @@ Research Notes:
 * GEARSET.DAT:
     * General game gearset info:
         * There are 14 item slots (counting the optional soul gems)
-        * Gearsets have a max name of ????
+        * Gearsets have a max name of 15 characters (Not counting the probable 0x00 at the end of the segment)
         * The game only cares about if the items are in the armory chest, not their position within the chest.
         * The game warns when a particular item can't be found
         * The game warns when a particular item is of a different color
@@ -39,3 +39,7 @@ Research Notes:
             * Starts at 0x00, and counts up
         * Empty entries have a 0x18 exactly 51 bytes after the count byte
             * Non empty entries have something else there
+*HOTBAR.DAT:
+    *General game info:
+        * Each hotbar has 12 entries
+        * Hotbars can be shared between classes or not
