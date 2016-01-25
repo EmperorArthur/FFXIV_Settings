@@ -60,9 +60,11 @@ in_file = open(in_file_name, "rb")
 
 #Confirm size matches in header
 check_header_size(in_file)
-#Skip to end of header / begining of data
+#Read in size of actual data
+data_size = get_data_size(in_file)
+#Skip to end of header / beginning of data
 in_file.seek(0x11)
 
-#Hardcode the number of macros (can't find it in the file anywhere)
-for i in range(0,100):
+#Print macros while there is still valid data
+while in_file.tell() < data_size:
     print_macro(macro(in_file))

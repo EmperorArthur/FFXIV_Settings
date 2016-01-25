@@ -4,7 +4,7 @@
 
 from struct import unpack,pack
 
-#Exclusive or each byte of a string wtih a number
+#Exclusive or each byte of a string with a number
 #Returns the modified string
 def xor(in_str,num):
     output = []
@@ -41,6 +41,12 @@ class section:
         #Add back the null byte when writing
         out_file.write(0x00)
 
+#Generic header format is
+#0x00-0x03 Unknown
+#0x04-0x07 File Size - 32 (in bytes)
+#0x08-0x0B Valid Data Size - 16 (in bytes)
+#0x0C-0x0F Unkown
+
 #Make sure the file size from the header matches the true file size
 #WARNING:  Will modify read position in file
 def check_header_size(in_file):
@@ -53,3 +59,9 @@ def check_header_size(in_file):
     #Confirm that the size matches
     if(file_size - header_file_size != 32):
         raise Exception('Invalid header size!')
+
+#Get the size of actual (valid) data in the file
+#WARNING:  Will modify read position in file
+def get_data_size(in_file):
+    in_file.seek(0x08)
+    return unpack('I',in_file.read(4))[0]+16
