@@ -25,6 +25,21 @@ def write_macro(out_file,macro):
     for i in range(0,15):
         write_section(out_file,0x73,{'type':'L','data':macro["data"][i]})
 
+def read_macro_file(in_file_name):
+    in_file = open(in_file_name, "rb")
+    header = read_header(in_file,0x11)
+    macros=[]
+    while in_file.tell() < header['data_size']:
+        macros.append(read_macro(in_file))
+    return (header,macros)
+
+def write_macro_file(out_file_name,(header,macros)):
+    out_file = open(out_file_name, "wb")
+    write_header(out_file,header)
+    for i in macros:
+         write_macro(out_file,i)
+    write_padding(out_file,header)
+
 def print_macro(in_macro):
     print("Name: ",in_macro["name"])
     print("Icon: ",in_macro["icon"])
@@ -36,19 +51,10 @@ def print_macro(in_macro):
         sanitized_line = i
         print("    ",sanitized_line)
 
-in_file_name = "MACRO.DAT"
-in_file = open(in_file_name, "rb")
-out_file_name = "MACRO_check.DAT"
-out_file = open(out_file_name, "wb")
+#Example usage
+macro_file = read_macro_file("MACRO.DAT")
+write_macro_file("MACRO_check.DAT",macro_file)
 
-header = read_header(in_file,0x11)
-write_header(out_file,header)
-
-#Print macros while there is still valid data
-while in_file.tell() < header['data_size']:
-    macro_in=read_macro(in_file)
-    if(macro_in["key"] != '000'):
-        print_macro(macro_in)
-    write_macro(out_file,macro_in)
-
-write_padding(out_file,header)
+for i in macro_file[1]:
+    if(i["key"] != '000'):
+        print_macro(i)

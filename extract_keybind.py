@@ -22,25 +22,31 @@ def write_keybind(out_file,keybind):
     data = keybind['key1'] + '.' + keybind['key1_modifier'] + ',' + keybind['key2'] + '.' + keybind['key2_modifier'] + ','
     write_section(out_file,0x73,{'type':'C','data':data})
 
-def print_key(in_key):
+def read_keybind_file(in_file_name):
+    in_file = open(in_file_name, "rb")
+    header = read_header(in_file,0x11)
+    keybinds=[]
+    while in_file.tell() < header['data_size']:
+        keybinds.append(read_keybind(in_file))
+    return (header,keybinds)
+
+def write_keybind_file(out_file_name,(header,keybinds)):
+    out_file = open(out_file_name, "wb")
+    write_header(out_file,header)
+    for i in keybinds:
+         write_keybind(out_file,i)
+    write_padding(out_file,header)
+
+def print_keybind(in_key):
     print("Command:  "           ,in_key['command'])
     print("    key1:            ",in_key['key1'])
     print("    key1_modifier:   ",in_key['key1_modifier'])
     print("    key2:            ",in_key['key2'])
     print("    key2_modifier:   ",in_key['key2_modifier'])
 
-in_file_name = "KEYBIND.DAT"
-in_file = open(in_file_name, "rb")
-out_file_name = "KEYBIND_check.DAT"
-out_file = open(out_file_name, "wb")
+#Example usage
+keybind_file = read_keybind_file("KEYBIND.DAT")
+write_keybind_file("KEYBIND_check.DAT",keybind_file)
 
-header = read_header(in_file,0x11)
-write_header(out_file,header)
-
-#Print keybinds while there is still valid data
-while in_file.tell() < header['data_size']:
-    keybind=read_keybind(in_file)
-    print_key(keybind)
-    write_keybind(out_file,keybind)
-
-write_padding(out_file,header)
+for i in keybind_file[1]:
+    print_keybind(i)
