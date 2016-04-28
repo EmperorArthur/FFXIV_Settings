@@ -11,31 +11,31 @@ def read_macro(in_file):
     macro_sections=[]
     #There are exactly 18 sections per macro
     for i in range(0,18):
-        macro_sections.append(section(0x73,in_file))
-    macro["name"] = macro_sections[0].data
-    macro["icon"] = macro_sections[1].data
-    macro["key"] = macro_sections[2].data
+        macro_sections.append(read_section(in_file,0x73))
+    macro["name"] = macro_sections[0]['data']
+    macro["icon"] = macro_sections[1]['data']
+    macro["key"] = macro_sections[2]['data']
     #Every macro has 15 lines
     for i in range(3,18):
-        macro["data"].append(macro_sections[i].data)
+        macro["data"].append(macro_sections[i]['data'])
     return macro
 
 def write_macro(out_file,macro):
     macro_sections=[]
     for i in range(0,18):
-        macro_sections.append(section(0x73))
-    macro_sections[0].type = 'T'
-    macro_sections[0].data = macro["name"]
-    macro_sections[1].type = 'I'
-    macro_sections[1].data = macro["icon"]
-    macro_sections[2].type = 'K'
-    macro_sections[2].data = macro["key"]
+        macro_sections.append({})
+    macro_sections[0]['type'] = 'T'
+    macro_sections[0]['data'] = macro["name"]
+    macro_sections[1]['type'] = 'I'
+    macro_sections[1]['data'] = macro["icon"]
+    macro_sections[2]['type'] = 'K'
+    macro_sections[2]['data'] = macro["key"]
     #Every macro has 15 lines
     for i in range(3,18):
-        macro_sections[i].type = 'L'
-        macro_sections[i].data = macro["data"][i-3]
+        macro_sections[i]['type'] = 'L'
+        macro_sections[i]['data'] = macro["data"][i-3]
     for i in range(0,18):
-        macro_sections[i].write(out_file)
+        write_section(out_file,0x73,macro_sections[i])
 
 def print_macro(in_macro):
     print("Name: ",in_macro["name"])

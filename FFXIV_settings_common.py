@@ -35,11 +35,29 @@ class section:
     def write(self,out_file):
         if(len(self.type) != 1):
             raise Exception('Invalid section type!')
-        header= self.type + pack('H',len(self.data))
-        out_file.write(header)
+        header= self.type + pack('H',len(self.data)+1)
+        out_file.write(xor(header,self.xor_value))
         out_file.write(xor(self.data,self.xor_value))
         #Add back the null byte when writing
-        out_file.write(0x00)
+        out_file.write(xor('\x00',self.xor_value))
+
+def read_section(in_file,xor_value):
+    section = {}
+    header = xor(in_file.read(3),xor_value)
+    section['type'] = header[0]
+    size = unpack('H',header[1:3])[0]
+    #Going to go ahead and lop off the null terminating byte now
+    section['data']= xor(in_file.read(size),xor_value)[0:-1]
+    return section
+
+def write_section(out_file,xor_value,section):
+    if(len(section['type']) != 1):
+            raise Exception('Invalid section type!')
+    header= section['type'] + pack('H',len(section['data'])+1)
+    out_file.write(xor(header,xor_value))
+    out_file.write(xor(section['data'],xor_value))
+    #Add back the null byte when writing
+    out_file.write(xor('\x00',xor_value))
 
 #Generic header format is
 #0x00-0x03 Unknown
