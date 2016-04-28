@@ -6,52 +6,41 @@
 from __future__ import print_function
 from FFXIV_settings_common import *
 
-class key_bind:
-    def __init__(self, in_file = None):
-        self.command = ''
-        self.key1 = ''
-        self.key1_modifier = ''
-        self.key2 = ''
-        self.key2_modifier = ''
-        if(in_file):
-            self.read(in_file)
+def read_keybind(in_file):
+    keybind={}
+    keybind['command'] =    read_section(in_file,0x73)['data']
+    key_string =            read_section(in_file,0x73)['data']
+    keys = key_string.split(',')
+    keybind['key1'] = keys[0].split('.')[0]
+    keybind['key1_modifier'] = keys[0].split('.')[1]
+    keybind['key2'] = keys[1].split('.')[0]
+    keybind['key2_modifier'] = keys[1].split('.')[1]
+    return keybind
 
-    def read(self,in_file):
-        self.command = section(0x73,in_file).data
-        key_string = section(0x73,in_file).data
-        keys = key_string.split(',')
-        self.key1 = keys[0].split('.')[0]
-        self.key1_modifier = keys[0].split('.')[1]
-        self.key2 = keys[1].split('.')[0]
-        self.key2_modifier = keys[1].split('.')[1]
-
-    def write(self,out_file):
-        command_section = section(0x73)
-        command_section.type = 'T'
-        command_section.data = self.command
-        command_section.write(out_file)
-        keys_section = section(0x73)
-        keys_section.type = 'C'
-        keys_section.data = self.key1 + '.' + self.key1_modifier + ',' + self.key2 + '.' + self.key2_modifier + ','
-        keys_section.write(out_file)
+def write_keybind(out_file,keybind):
+    write_section(out_file,0x73,{'type':'T','data':keybind['command']})
+    data = keybind['key1'] + '.' + keybind['key1_modifier'] + ',' + keybind['key2'] + '.' + keybind['key2_modifier'] + ','
+    write_section(out_file,0x73,{'type':'C','data':data})
 
 def print_key(in_key):
-    print("Command:  ",in_key.command)
-    print("    key1:            ",in_key.key1)
-    print("    key1_modifier:   ",in_key.key1_modifier)
-    print("    key2:            ",in_key.key2)
-    print("    key2_modifier:   ",in_key.key2_modifier)
+    print("Command:  "           ,in_key['command'])
+    print("    key1:            ",in_key['key1'])
+    print("    key1_modifier:   ",in_key['key1_modifier'])
+    print("    key2:            ",in_key['key2'])
+    print("    key2_modifier:   ",in_key['key2_modifier'])
 
 in_file_name = "KEYBIND.DAT"
 in_file = open(in_file_name, "rb")
+out_file_name = "KEYBIND_check.DAT"
+out_file = open(out_file_name, "wb")
 
-#Confirm size matches in header
-check_header_size(in_file)
-#Read in size of actual data
-data_size = get_data_size(in_file)
-#Skip to end of header / beginning of data
-in_file.seek(0x10)
+header = read_header(in_file,0x11)
+write_header(out_file,header)
 
 #Print keybinds while there is still valid data
-while in_file.tell() < data_size:
-    print_key(key_bind(in_file))
+while in_file.tell() < header['data_size']:
+    keybind=read_keybind(in_file)
+    print_key(keybind)
+    write_keybind(out_file,keybind)
+
+write_padding(out_file,header)

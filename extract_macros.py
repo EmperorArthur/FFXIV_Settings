@@ -51,5 +51,4 @@ while in_file.tell() < header['data_size']:
         print_macro(macro_in)
     write_macro(out_file,macro_in)
 
-#Pad the output file with 0x00 (not xored)
-out_file.write('\x00'*(header['file_size']-header['data_size']))
+write_padding(out_file,header)

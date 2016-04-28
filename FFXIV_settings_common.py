@@ -83,6 +83,10 @@ def write_header(out_file,header):
     out_file.write(pack('I',header['data_size']-16))
     out_file.write(header['unkown1'])
 
+#Pad the output file with 0x00 (not xored)
+def write_padding(out_file,header):
+    out_file.write('\x00'*(header['file_size']-header['data_size']))
+
 #Make sure the file size from the header matches the true file size
 #WARNING:  Will modify read position in file
 def check_header_size(in_file):
