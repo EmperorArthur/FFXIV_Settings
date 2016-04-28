@@ -16,31 +16,7 @@ def xor(in_str,num):
     return output
 
 #Read and unpack a section of data
-#Since FFXIV likes to xor the user data by a constant, that constant needs to be provided at object creation
-class section:
-    def __init__(self, value_to_xor_by, in_file = None):
-        self.type = ''
-        self.data = ''
-        self.xor_value = value_to_xor_by
-        if(in_file):
-            self.read(in_file)
-
-    def read(self,in_file):
-        header = xor(in_file.read(3),self.xor_value)
-        self.type = header[0]
-        size = unpack('H',header[1:3])[0]
-        #Going to go ahead and lop off the null terminating byte now
-        self.data= xor(in_file.read(size),self.xor_value)[0:-1]
-
-    def write(self,out_file):
-        if(len(self.type) != 1):
-            raise Exception('Invalid section type!')
-        header= self.type + pack('H',len(self.data)+1)
-        out_file.write(xor(header,self.xor_value))
-        out_file.write(xor(self.data,self.xor_value))
-        #Add back the null byte when writing
-        out_file.write(xor('\x00',self.xor_value))
-
+#Since FFXIV likes to xor the user data by a constant, that constant needs to be provided
 def read_section(in_file,xor_value):
     section = {}
     header = xor(in_file.read(3),xor_value)
@@ -50,6 +26,8 @@ def read_section(in_file,xor_value):
     section['data']= xor(in_file.read(size),xor_value)[0:-1]
     return section
 
+#Write a section of data
+#Since FFXIV likes to xor the user data by a constant, that constant needs to be provided
 def write_section(out_file,xor_value,section):
     if(len(section['type']) != 1):
             raise Exception('Invalid section type!')
