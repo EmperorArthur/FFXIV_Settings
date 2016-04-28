@@ -65,6 +65,24 @@ def write_section(out_file,xor_value,section):
 #0x08-0x0B Valid Data Size - 16 (in bytes)
 #0x0C-0x0F Unkown
 
+#Read and parse the header
+def read_header(in_file,header_size):
+    header = {}
+    header['file_size'] = check_header_size(in_file)
+    header['data_size'] = get_data_size(in_file)
+    in_file.seek(0x00,0)
+    header['unkown0'] = in_file.read(0x04)
+    in_file.seek(0x0C,0)
+    header['unkown1'] = in_file.read(header_size-0x0C)
+    return header
+
+#Write a parsed header
+def write_header(out_file,header):
+    out_file.write(header['unkown0'])
+    out_file.write(pack('I',header['file_size']-32))
+    out_file.write(pack('I',header['data_size']-16))
+    out_file.write(header['unkown1'])
+
 #Make sure the file size from the header matches the true file size
 #WARNING:  Will modify read position in file
 def check_header_size(in_file):
