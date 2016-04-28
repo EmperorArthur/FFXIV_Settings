@@ -77,6 +77,7 @@ def check_header_size(in_file):
     #Confirm that the size matches
     if(file_size - header_file_size != 32):
         raise Exception('Invalid header size!')
+    return file_size
 
 #Get the size of actual (valid) data in the file
 #WARNING:  Will modify read position in file
