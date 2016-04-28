@@ -26,7 +26,7 @@ Research Notes:
         * The game only cares about if the items are in the armory chest, not their position within the chest.
         * The game warns when a particular item can't be found
         * The game warns when a particular item is of a different color
-        * Does the game warn or fail if there is an item, but it's glamored differently?
+        * The game warns when a particular item is glamored differently
         * Does the game warn, fail, or silently succeed when substituting a non bonded item for a bonded item?
             * If both are in the armory chest, is the bonded item always chosen?
         * Does the game warn or fail a regular is substituted w/ high quality or the other way around?
