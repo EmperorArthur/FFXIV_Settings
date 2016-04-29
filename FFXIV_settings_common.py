@@ -63,7 +63,8 @@ def write_header(out_file,header):
 
 #Pad the output file with 0x00 (not xored)
 def write_padding(out_file,header):
-    out_file.write('\x00'*(header['file_size']-header['data_size']))
+    padding = header['file_size']-header['data_size']
+    out_file.write('\x00'*padding)
 
 #Make sure the file size from the header matches the true file size
 #WARNING:  Will modify read position in file
